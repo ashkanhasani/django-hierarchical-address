@@ -1,4 +1,5 @@
 from django.db import models
+import json
 
 # Create your models here.
 
@@ -77,3 +78,123 @@ class Address(models.Model):
     def __str__(self):
         parts = [self.address_line, self.city.name if self.city else '', self.state_province.name if self.state_province else '', self.country.name if self.country else '']
         return ", ".join([p for p in parts if p])
+
+class ContinentField(models.JSONField):
+    description = "A field to store continent data as JSON"
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+    def from_db_value(self, value, expression, connection):
+        if value is None:
+            return value
+        data = super().from_db_value(value, expression, connection)
+        from .models import Continent
+        return Continent(**data) if data else None
+    def to_python(self, value):
+        from .models import Continent
+        if isinstance(value, Continent) or value is None:
+            return value
+        if isinstance(value, dict):
+            return Continent(**value)
+        if isinstance(value, str):
+            return Continent(**json.loads(value))
+        return value
+    def get_prep_value(self, value):
+        if hasattr(value, '__dict__'):
+            return {k: v for k, v in value.__dict__.items() if not k.startswith('_')}
+        return value
+
+class CountryField(models.JSONField):
+    description = "A field to store country data as JSON"
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+    def from_db_value(self, value, expression, connection):
+        if value is None:
+            return value
+        data = super().from_db_value(value, expression, connection)
+        from .models import Country
+        return Country(**data) if data else None
+    def to_python(self, value):
+        from .models import Country
+        if isinstance(value, Country) or value is None:
+            return value
+        if isinstance(value, dict):
+            return Country(**value)
+        if isinstance(value, str):
+            return Country(**json.loads(value))
+        return value
+    def get_prep_value(self, value):
+        if hasattr(value, '__dict__'):
+            return {k: v for k, v in value.__dict__.items() if not k.startswith('_')}
+        return value
+
+class StateProvinceField(models.JSONField):
+    description = "A field to store state/province data as JSON"
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+    def from_db_value(self, value, expression, connection):
+        if value is None:
+            return value
+        data = super().from_db_value(value, expression, connection)
+        from .models import StateProvince
+        return StateProvince(**data) if data else None
+    def to_python(self, value):
+        from .models import StateProvince
+        if isinstance(value, StateProvince) or value is None:
+            return value
+        if isinstance(value, dict):
+            return StateProvince(**value)
+        if isinstance(value, str):
+            return StateProvince(**json.loads(value))
+        return value
+    def get_prep_value(self, value):
+        if hasattr(value, '__dict__'):
+            return {k: v for k, v in value.__dict__.items() if not k.startswith('_')}
+        return value
+
+class CityField(models.JSONField):
+    description = "A field to store city data as JSON"
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+    def from_db_value(self, value, expression, connection):
+        if value is None:
+            return value
+        data = super().from_db_value(value, expression, connection)
+        from .models import City
+        return City(**data) if data else None
+    def to_python(self, value):
+        from .models import City
+        if isinstance(value, City) or value is None:
+            return value
+        if isinstance(value, dict):
+            return City(**value)
+        if isinstance(value, str):
+            return City(**json.loads(value))
+        return value
+    def get_prep_value(self, value):
+        if hasattr(value, '__dict__'):
+            return {k: v for k, v in value.__dict__.items() if not k.startswith('_')}
+        return value
+
+class CountyField(models.JSONField):
+    description = "A field to store county data as JSON"
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+    def from_db_value(self, value, expression, connection):
+        if value is None:
+            return value
+        data = super().from_db_value(value, expression, connection)
+        from .models import County
+        return County(**data) if data else None
+    def to_python(self, value):
+        from .models import County
+        if isinstance(value, County) or value is None:
+            return value
+        if isinstance(value, dict):
+            return County(**value)
+        if isinstance(value, str):
+            return County(**json.loads(value))
+        return value
+    def get_prep_value(self, value):
+        if hasattr(value, '__dict__'):
+            return {k: v for k, v in value.__dict__.items() if not k.startswith('_')}
+        return value

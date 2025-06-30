@@ -72,23 +72,25 @@ class MyModel(models.Model):
     address = models.OneToOneField(Address, on_delete=models.CASCADE)
 ```
 
-### 3. **Use as Embedded Models/Fields**
+### 3. **Use as Embedded Models/Fields or Custom Fields**
 
-You can now use the address models as embedded fields (not just relations). For example, you can define your own model with address fields directly:
+You can now use the address models as embedded fields (not just relations) using custom fields. For example:
 
 ```python
 from django.db import models
-from django_places.models import Country, StateProvince, City, County
+from django_places.models import CountryField, StateProvinceField, CityField, CountyField
 
 class MyCustomAddress(models.Model):
-    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
-    state_province = models.ForeignKey(StateProvince, on_delete=models.SET_NULL, null=True)
-    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True)
-    county = models.ForeignKey(County, on_delete=models.SET_NULL, null=True)
+    country = CountryField(null=True, blank=True, help_text="Country of origin")
+    state_province = StateProvinceField(null=True, blank=True)
+    city = CityField(null=True, blank=True)
+    county = CountyField(null=True, blank=True)
     address_line = models.CharField(max_length=255, blank=True)
     zip_code = models.CharField(max_length=20, blank=True)
     # ... add your own fields ...
 ```
+
+All standard Django field options (`null`, `blank`, `default`, `help_text`, etc.) are supported for these custom fields.
 
 Or, you can use the provided models as abstract base classes to create your own address model:
 
@@ -170,6 +172,7 @@ GET /api/places/cities/?state_province=5
 - **Override serializers or viewsets:** For custom API behavior, override the provided serializers or viewsets in your project.
 - **Admin customization:** The admin form uses custom JavaScript for chained selects. You can further customize this by editing `django_places/static/django_places/address_chained.js`.
 - **Use as fields or embedded models:** You can use the address models as fields in your own models, or as abstract base classes.
+- **Custom field options:** All custom address fields accept standard Django field options (`null`, `blank`, `default`, `help_text`, etc.).
 
 ---
 
@@ -211,7 +214,7 @@ A: Subclass the Address model and add your fields, or use a OneToOneField to ext
 A: Yes, the models are designed to be extensible. For multi-language, consider using [django-parler](https://django-parler.readthedocs.io/) or similar.
 
 **Q: Can I use address models as fields instead of relations?**
-A: Yes! You can use the address models as fields in your own models, or as abstract base classes for embedded address data.
+A: Yes! You can use the address models as fields in your own models, or as abstract base classes for embedded address data. All standard Django field options are supported for these fields.
 
 ---
 
