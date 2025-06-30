@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-hierarchical-address',
-    version='0.1.0',
+    version='0.2.0',
     description='A reusable Django app for hierarchical address fields.',
     author='Your Name',
     packages=find_packages(),
