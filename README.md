@@ -1,4 +1,4 @@
-# Django Places
+# Django Hierarchical Address
 
 A reusable Django app for hierarchical, international address fields with full REST API and Django admin support. Easily add continent, country, state/province, city, county, and detailed address fields to any model, with automatic filtering and dynamic dropdowns.
 
@@ -10,6 +10,7 @@ A reusable Django app for hierarchical, international address fields with full R
 - Full Django REST Framework API with filtering and nested serialization
 - Django admin integration with dynamic, chained selects (custom JavaScript)
 - Highly customizable and extensible
+- Use as relations (ForeignKey/OneToOne) or as embedded models/fields
 - Ready for pip installation
 
 ---
@@ -18,9 +19,9 @@ A reusable Django app for hierarchical, international address fields with full R
 
 1. **Install the package (in your Django project):**
    ```bash
-   pip install django-places  # or your package name if published
+   pip install django-hierarchical-address
    # OR for local development:
-   pip install -e /path/to/your/django-rest-places
+   pip install -e /path/to/your/django-hierarchical-address
    ```
 
 2. **Add to `INSTALLED_APPS` in your `settings.py`:**
@@ -71,7 +72,36 @@ class MyModel(models.Model):
     address = models.OneToOneField(Address, on_delete=models.CASCADE)
 ```
 
-### 3. **Django Admin**
+### 3. **Use as Embedded Models/Fields**
+
+You can now use the address models as embedded fields (not just relations). For example, you can define your own model with address fields directly:
+
+```python
+from django.db import models
+from django_places.models import Country, StateProvince, City, County
+
+class MyCustomAddress(models.Model):
+    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
+    state_province = models.ForeignKey(StateProvince, on_delete=models.SET_NULL, null=True)
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True)
+    county = models.ForeignKey(County, on_delete=models.SET_NULL, null=True)
+    address_line = models.CharField(max_length=255, blank=True)
+    zip_code = models.CharField(max_length=20, blank=True)
+    # ... add your own fields ...
+```
+
+Or, you can use the provided models as abstract base classes to create your own address model:
+
+```python
+from django_places.models import Address
+
+class MyAbstractAddress(Address):
+    extra_field = models.CharField(max_length=100)
+    class Meta:
+        abstract = True
+```
+
+### 4. **Django Admin**
 - All address models are registered in the admin.
 - The Address admin form features dynamic dropdowns for country, state/province, city, and county.
 - When you select a parent (e.g., country), the child dropdown (e.g., state/province) updates instantly.
@@ -79,7 +109,7 @@ class MyModel(models.Model):
 **Admin Form Example:**
 ![Admin Form Example](docs/admin_form_example.png)
 
-### 4. **REST API**
+### 5. **REST API**
 - All address models are available via REST endpoints:
   - `/api/places/continents/`
   - `/api/places/countries/`
@@ -139,6 +169,7 @@ GET /api/places/cities/?state_province=5
 - **Extend models:** You can subclass or swap out any model for your own needs.
 - **Override serializers or viewsets:** For custom API behavior, override the provided serializers or viewsets in your project.
 - **Admin customization:** The admin form uses custom JavaScript for chained selects. You can further customize this by editing `django_places/static/django_places/address_chained.js`.
+- **Use as fields or embedded models:** You can use the address models as fields in your own models, or as abstract base classes.
 
 ---
 
@@ -153,8 +184,8 @@ GET /api/places/cities/?state_province=5
 
 1. Clone the repo and install in editable mode:
    ```bash
-   git clone https://github.com/ashkanhasani/Django-rest-places.git
-   cd django-rest-places
+   git clone https://github.com/ashkanhasani/django-hierarchical-address.git
+   cd django-hierarchical-address
    pip install -e .
    ```
 2. Run the example project:
@@ -178,6 +209,9 @@ A: Subclass the Address model and add your fields, or use a OneToOneField to ext
 
 **Q: Can I use this in a multi-tenant or multi-language project?**
 A: Yes, the models are designed to be extensible. For multi-language, consider using [django-parler](https://django-parler.readthedocs.io/) or similar.
+
+**Q: Can I use address models as fields instead of relations?**
+A: Yes! You can use the address models as fields in your own models, or as abstract base classes for embedded address data.
 
 ---
 
